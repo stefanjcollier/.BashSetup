@@ -127,3 +127,17 @@ if [ -f $function_file ]; then
 else 
     echo ".bashrc[error]: Function file cannot be found at '${function_file}'"
 fi
+
+p_function_file=~/.bash_files/private/private_functions.sh
+if [ -f $p_function_file ]; then
+    . $p_function_file
+else 
+    echo ".bashrc[error]: Private Function file cannot be found at '${p_function_file}'"
+fi
+
+p_alias_file=~/.bash_files/private/private_alias.sh
+if [ -f $p_alias_file ]; then
+    . $p_alias_file
+else 
+    echo ".bashrc[error]: Private Alias file cannot be found at '${p_alias_file}'"
+fi

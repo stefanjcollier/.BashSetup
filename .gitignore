@@ -3,3 +3,5 @@
 !.bashrc
 !.bash_files
 !.bash_files/*
+!.bash_files/private/
+!.bash_files/private/*
