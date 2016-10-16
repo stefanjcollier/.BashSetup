@@ -135,7 +135,7 @@ else
     echo ".bashrc[error]: Private Function file cannot be found at '${p_function_file}'"
 fi
 
-p_alias_file=~/.bash_files/private/private_alias.sh
+p_alias_file=~/.bash_files/private/private_aliases.sh
 if [ -f $p_alias_file ]; then
     . $p_alias_file
 else 
