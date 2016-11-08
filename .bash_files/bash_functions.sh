@@ -1,7 +1,7 @@
 
 # Uses the gimmme program to change directory to repositories based on substring
 function gimme {
-   python /home/stefan/Git/gimme/gimme.py $*
+   python /home/stefan/git/gimme/gimme.py $*
    if [ $? -eq 0  ]; then
        cd `cat ~/.stools_config/gimme/gimme_hist.txt`
    fi
@@ -18,17 +18,19 @@ function open {
 }
 
 function fix {
-	if [ "$1" == '--bash' ]; then
-		vim '~/.bashrc'
-	elif [ "$1" == '--function' ]; then
-		vim '~/.bash_files/.bash_functions.sh'
-	elif [ "$1" == '--alias' ]; then
-		vim '~/.bash_files/.bash_aliases.sh'
+	if   [[ $1 =~ 'bash' ]]; then
+		vim ~/.bashrc
+	elif [[ $1 =~ 'function' ]]; then
+		vim ~/.bash_files/bash_functions.sh
+	elif [[ $1 =~ 'alias' ]]; then
+		vim ~/.bash_files/bash_aliases.sh
 	elif [ "$1" == '--help' ]; then
-		echo 'fix: $fix --[bash|function|alias]'
+		echo 'fix Usage:'
+		echo '    $fix --[bash|function|alias]'
 	else
-		echo 'fix: Unkown option...'
+		echo "fix: Unkown option \"${1}\""
 		echo '     try $fix --help'
 	fi
+	. ~/.bashrc
 
 }
