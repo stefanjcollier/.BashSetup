@@ -1,12 +1,5 @@
-
-# Uses the gimmme program to change directory to repositories based on substring
-function gimme {
-   python /home/stefan/git/gimme/gimme.py $*
-   if [ $? -eq 0  ]; then
-       cd `cat ~/.stools_config/gimme/gimme_hist.txt`
-   fi
-}
-
+#Allows the use of gimme
+#source ~/.stools_config/gimme/gimme_function.sh
 
 # Opens the file explorer
 function open {
