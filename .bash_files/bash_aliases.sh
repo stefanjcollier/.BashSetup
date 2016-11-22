@@ -17,6 +17,7 @@ alias googleping=pingme
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
 alias seurat='ssh productizer@seurat.ecs.soton.ac.uk'
 alias saturn='ssh user@svm-sc22g13-gdp-saturn.ecs.soton.ac.uk'
+alias class='ssh user@svm-tp10g13-gdp.ecs.soton.ac.uk'
 alias myrtle='ssh productizer@myrtle.ecs.soton.ac.uk'
 
 
@@ -25,9 +26,9 @@ alias gitsave='bash ~/git/BashScripts/gitsave.sh'
 alias gitstat='bash ~/git/BashScripts/bash/GitStatusRefresh.sh' 
 
 alias gs='clear; git status'
-alias gl='clear; git log --pretty=online'
-alias gp='echo git pushing; git push'
-alias gpu='git push'
+alias gl='clear; git log --pretty=oneline'
+alias gp='echo git pushing; git push;'
+alias gpu='git push; '
 alias gpl='git pull'
 alias gc='git add .; git commit'
 alias ghelp='alias | grep git'
