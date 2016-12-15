@@ -18,9 +18,11 @@ alias ip=ipython
 # SSH commands
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
 alias seurat='ssh productizer@seurat.ecs.soton.ac.uk'
-alias saturn='ssh user@svm-sc22g13-gdp-saturn.ecs.soton.ac.uk'
+alias saturn='ssh user@svm-tp10g13-gdp.ecs.soton.ac.uk'
 alias class='ssh user@svm-tp10g13-gdp.ecs.soton.ac.uk'
+alias classifier=class
 alias myrtle='ssh productizer@myrtle.ecs.soton.ac.uk'
+alias olivia=myrtle
 
 
 #----[ Stefans Git Commands ]---- 
