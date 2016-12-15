@@ -13,6 +13,8 @@ alias pingme='ping www.google.com'
 alias pinggoogle=pingme
 alias googleping=pingme
 
+alias ip=ipython
+
 # SSH commands
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
 alias seurat='ssh productizer@seurat.ecs.soton.ac.uk'
@@ -30,8 +32,12 @@ alias gl='clear; git log --pretty=oneline'
 alias gp='echo git pushing; git push;'
 alias gpu='git push; '
 alias gpl='git pull'
-alias gc='git add .; git commit'
+alias gc='git commit'
+alias gac='git add .;git commit;'
 alias ghelp='alias | grep git'
 
 #----[ Stefan Defined Scripts ]----
 alias google='echo Not Imported Yet'
+
+# Find the date of a site
+# https://www.google.co.uk/search?q=inurl:<url>&as_qdr=y15

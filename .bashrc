@@ -140,14 +140,14 @@ user="\[\e[34;1m\]\u@\h\[\e[30;1m\]"
 job_count="\[\e[34;1m\]jobs:\j\[\e[30;1m\]"
 
 # The current PWD. e.g. "/home/me/documents"
-path="\[\e[32;1m\]\w\[\e[30;1m\]"
+dis_path="\[\e[32;1m\]\w\[\e[30;1m\]"
 
 # The current command number with colour highlighting based on the last commands exit status. e.g. "! 200" in green if $?=0
 cmd_code="\[\e[\`if [ \$? = 0 ]; then echo 34; else echo 31; fi\`;1m\]! \!\[\e[30;1m\]"
 
 # The current branch name
 branch="\$(BRANCH=\$(ps1_git_branch); if [ \$BRANCH ]; then echo \"\[\e[30;1m\]-(\[\e[36;1m\]\$BRANCH\[\e[30;1m\])\"; fi)"
-PS1="\n\[\e[30;1m\](${user})-(${job_count})-(${path})
+PS1="\n\[\e[30;1m\](${user})-(${job_count})-(${dis_path})
 -(${cmd_code})${branch}-> \[\e[0m\]"
 
 
