@@ -27,3 +27,6 @@ function fix {
 	. ~/.bashrc
 
 }
+
+
+source ~/.stools_config/gimme/gimme_function.sh

@@ -189,4 +189,3 @@ else
     echo ".bashrc[error]: Private Alias file cannot be found at '${p_alias_file}'"
 fi
 
-source ~/.stools_config/gimme/gimme_function.sh
