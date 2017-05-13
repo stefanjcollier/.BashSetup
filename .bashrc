@@ -191,3 +191,4 @@ else
     echo ".bashrc[error]: Private Alias file cannot be found at '${p_alias_file}'"
 fi
 
+PATH="/usr/sbin:${PATH}"

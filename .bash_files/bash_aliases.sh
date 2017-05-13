@@ -7,6 +7,8 @@ alias rem='trash'
 alias cd.='cd ..'
 alias cd..='cd ../..'
 alias cd...='cd ../../..'
+alias windows='cd /mnt/c/Users/Stefa'
+alias win=windows
 
 alias clc='clear'
 alias pingme='ping www.google.com'
@@ -14,6 +16,10 @@ alias pinggoogle=pingme
 alias googleping=pingme
 
 alias ip=ipython
+alias node=nodejs
+alias django='python zeus_src/manage.py' 
+alias dj=django
+
 
 # SSH commands
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
