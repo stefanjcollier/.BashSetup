@@ -10,6 +10,9 @@ alias cd...='cd ../../..'
 alias windows='cd /mnt/c/Users/Stefa'
 alias win=windows
 
+alias get="curl -sSi -X GET -H 'Accept: application/json'"
+alias post="curl -sSi -X POST -H 'Content-type: application/json' -d"
+
 alias clc='clear'
 alias pingme='ping www.google.com'
 alias pinggoogle=pingme
@@ -17,9 +20,13 @@ alias googleping=pingme
 
 alias ip=ipython
 alias node=nodejs
+
 alias django='python zeus_src/manage.py' 
 alias dj=django
-
+alias run_server=./run_server.sh
+alias run=run_server
+alias test_server=./test_server.sh
+alias tests=test_server
 
 # SSH commands
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
