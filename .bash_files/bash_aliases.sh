@@ -21,13 +21,6 @@ alias googleping=pingme
 alias ip=ipython
 alias node=nodejs
 
-alias django='python zeus_src/manage.py' 
-alias dj=django
-alias run_server=./run_server.sh
-alias run=run_server
-alias test_server=./test_server.sh
-alias tests=test_server
-
 # SSH commands
 alias degas='ssh productizer@degas.ecs.soton.ac.uk'
 alias seurat='ssh productizer@seurat.ecs.soton.ac.uk'
