@@ -48,7 +48,7 @@ alias gp='echo git pushing; git push;'
 alias gpu='git push; '
 alias gpl='git pull'
 alias gc='git commit'
-alias gac='git add .;git commit;'
+alias gac='git add .;git commit'
 alias ghelp='alias | grep git'
 
 #----[ Stefan Defined Scripts ]----

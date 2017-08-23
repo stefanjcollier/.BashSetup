@@ -30,8 +30,13 @@ function fix {
 
 
 
-alias find_prints='echo Finding print statements!; for file in $(find . -name *.py); do  result=$(cat $file | grep print); if [[ ! -z $result ]]; then echo;echo; echo "==============================================================";echo "================[ ${file} ]============"; cat $file | grep print;fi; done'
+alias find_prints='echo Finding print statements!; for file in $(find . -name *.py); do  result=$(cat $file | grep print); if [[ ! -z $result ]]; then echo;echo; echo "==============================================================";echo "================[ ${file} ]============"; cat $file | grep print -n;fi; done'
 alias find_print=find_prints
 
+alias find_logs_deprecated='echo Finding console.log statements!; for file in $(find . -type d \( -path ./node_modules -o -path ./.tmp -o -path ./dist -o -path ./bin \) -prune -o -name *.js -print); do  result=$(cat $file | grep console.log); if [[ ! -z $result ]]; then echo;echo; echo "==============================================================";echo "================[ ${file} ]============"; cat $file | grep console.log -n -B 2 -A 2;fi; done'
+
+alias find_logs="echo; echo Finding console.logs!; echo; ag -Q console.log -B 2 -A 2 || echo None Found "
+alias find_log=find_logs
+alias find_console=find_logs
 source ~/.stools_config/gimme/gimme_function.sh
 
