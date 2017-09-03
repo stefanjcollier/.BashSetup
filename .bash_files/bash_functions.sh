@@ -13,7 +13,16 @@ function open {
 function fix {
 	if   [[ $1 =~ 'bash' ]]; then
 		vim ~/.bashrc
-	elif [[ $1 =~ 'function' ]]; then
+	elif [[ $1 =~ 'priv' ]]; then 
+		if [[ $2 =~ 'func' ]]; then
+			vim ~/.bash_files/private/private_functions.sh
+		elif [[ $2 =~ 'alias' ]]; then
+			vim ~/.bash_files/private/private_aliases.sh
+		else
+			echo 'fix private Usage:'
+			echo '            $fix private [function|alias]'
+		fi
+	elif [[ $1 =~ 'func' ]]; then
 		vim ~/.bash_files/bash_functions.sh
 	elif [[ $1 =~ 'alias' ]]; then
 		vim ~/.bash_files/bash_aliases.sh
@@ -33,5 +42,6 @@ function fix {
 alias find_prints='echo Finding print statements!; for file in $(find . -name *.py); do  result=$(cat $file | grep print); if [[ ! -z $result ]]; then echo;echo; echo "==============================================================";echo "================[ ${file} ]============"; cat $file | grep print;fi; done'
 alias find_print=find_prints
 
-source ~/.stools_config/gimme/gimme_function.sh
+
+#source ~/.stools_config/gimme/gimme_function.sh
 
