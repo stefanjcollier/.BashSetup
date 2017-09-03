@@ -17,13 +17,6 @@ alias googleping=pingme
 alias ip=ipython
 alias node=nodejs
 
-alias django='python zeus_src/manage.py' 
-alias dj=django
-alias run_server=./run_server.sh
-alias run=run_server
-alias test_server=./test_server.sh
-alias tests=test_server
-
 #----[ Stefans Git Commands ]---- 
 alias gitsave='bash ~/git/BashScripts/gitsave.sh' 
 alias gitstat='bash ~/git/BashScripts/bash/GitStatusRefresh.sh' 
@@ -34,7 +27,7 @@ alias gp='echo git pushing; git push;'
 alias gpu='git push; '
 alias gpl='git pull'
 alias gc='git commit'
-alias gac='git add .;git commit;'
+alias gac='git add .;git commit'
 alias ghelp='alias | grep git'
 
 #----[ Stefan Defined Scripts ]----
