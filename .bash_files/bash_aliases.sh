@@ -14,11 +14,14 @@ alias get="curl -sSi -X GET -H 'Accept: application/json'"
 alias post="curl -sSi -X POST -H 'Content-type: application/json' -d"
 
 alias clc='clear'
+alias ccc='clear'
+alias cc='clear'
 alias pingme='ping www.google.com'
 alias pinggoogle=pingme
 alias googleping=pingme
 
 alias ip=ipython
+alias bp=bpython
 alias node=nodejs
 
 # SSH commands

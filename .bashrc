@@ -148,7 +148,7 @@ cmd_code="\[\e[\`if [ \$? = 0 ]; then echo 34; else echo 31; fi\`;1m\]! \!\[\e[3
 # The current branch name
 branch="\$(BRANCH=\$(ps1_git_branch); if [ \$BRANCH ]; then echo \"\[\e[30;1m\]-(\[\e[36;1m\]\$BRANCH\[\e[30;1m\])\"; fi)"
 
-PS1_line_1="\n\[\e[30;1m\](${user})-(${job_count})-(${dis_path})"
+PS1_line_1="\[\e[30;1m\](${user})-(${job_count})-(${dis_path})"
 PS1="${PS1_line_1}
 -(${cmd_code})${branch}-> \[\e[0m\]"
 
