@@ -18,14 +18,11 @@ alias googleping=pingme
 
 alias ip=ipython
 alias bp=bpython
-alias node=nodejs
 
 #----[ Stefans Git Commands ]---- 
-alias gitsave='bash ~/git/BashScripts/gitsave.sh' 
-alias gitstat='bash ~/git/BashScripts/bash/GitStatusRefresh.sh' 
-
 alias gs='clear; git status'
-alias gl='clear; git log --pretty=oneline'
+alias gl='clear; git log --pretty=oneline --abbrev-commit --all' 
+alias glg='clear; git log --pretty=oneline --abbrev-commit --all --graph' 
 alias gp='echo git pushing; git push;'
 alias gpu='git push; '
 alias gps='git push'
