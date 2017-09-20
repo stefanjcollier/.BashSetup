@@ -20,6 +20,7 @@ alias ip=ipython
 alias bp=bpython
 
 #----[ Stefans Git Commands ]---- 
+alias g='clear; git'
 alias gs='clear; git status'
 alias gl='clear; git log --pretty=oneline --abbrev-commit --all' 
 alias glg='clear; git log --pretty=oneline --abbrev-commit --all --graph' 

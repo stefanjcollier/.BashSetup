@@ -2,6 +2,9 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# The current command number with colour highlighting based on the last commands exit status. e.g. "! 200" in green if $?=0
+prev_exit_code=$?
+cmd_code="\[\e[\`if [ \$prev_exit_code = 0 ]; then echo 34; else echo 31; fi\`;1m\]! \!\[\e[30;1m\]"
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -74,7 +77,7 @@ fi
 
 # some more ls aliases
 alias ll='ls -alF'
-alias la='ls -A'
+alias la='ls -a'
 alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
@@ -138,18 +141,18 @@ function ps1_git_branch {
 user="\[\e[34;1m\]\u@\h\[\e[30;1m\]"
 
 # The number of jobs running. e.g. "job:2"
-job_count="\[\e[34;1m\]jobs:\j\[\e[30;1m\]"
-
+function  PS1_opt_jobs {
+job_count=""
+	if [[ -z `jobs -sp` ]]; then echo ''; else echo -e "-(\e[34;1mjobs:$(jobs -ps | wc -l)\e[30;1m)" ;fi
+}
 # The current PWD. e.g. "/home/me/documents"
 dis_path="\[\e[32;1m\]\$(pwd| sed 's:/home/stefan:~:g' | sed 's:/mnt/c/Users/Stefa:¬:g')\[\e[30;1m\]"
 
-# The current command number with colour highlighting based on the last commands exit status. e.g. "! 200" in green if $?=0
-cmd_code="\[\e[\`if [ \$? = 0 ]; then echo 34; else echo 31; fi\`;1m\]! \!\[\e[30;1m\]"
 
 # The current branch name
 branch="\$(BRANCH=\$(ps1_git_branch); if [ \$BRANCH ]; then echo \"\[\e[30;1m\]-(\[\e[36;1m\]\$BRANCH\[\e[30;1m\])\"; fi)"
 
-PS1_line_1="\[\e[30;1m\](${user})-(${job_count})-(${dis_path})"
+PS1_line_1="\[\e[30;1m\](${user})\$(PS1_opt_jobs)-(${dis_path})"
 PS1="${PS1_line_1}
 -(${cmd_code})${branch}-> \[\e[0m\]"
 
