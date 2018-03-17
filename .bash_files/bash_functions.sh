@@ -1,15 +1,6 @@
 #Allows the use of gimme
 #source ~/.stools_config/gimme/gimme_function.sh
 
-# Opens the file explorer
-function open {
-   if [ -z $1 ]; then
-	nautilus .
-   else
-	nautilus $1
-   fi
-}
-
 function fix {
 	if   [[ $1 =~ 'bash' ]]; then
 		vim ~/.bashrc
@@ -51,4 +42,10 @@ alias find_logs_deprecated='echo Finding console.log statements!; for file in $(
 alias find_logs="echo; echo Finding console.logs!; echo; ag -Q console.log -B 2 -A 2 || echo None Found "
 alias find_log=find_logs
 alias find_console=find_logs
+
+function sleep-in() {
+  local minutes=$1
+  local datetime=`date -v+${minutes}M +"%m/%d/%y %H:%M:%S"`
+  sudo pmset schedule sleep "$datetime"
+}
 

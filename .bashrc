@@ -61,19 +61,11 @@ unset color_prompt force_color_prompt
 
 
 # enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto	'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+alias ls='ls --color=auto	'
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 
 # some more ls aliases
 alias ll='ls -alF'
@@ -141,10 +133,8 @@ function ps1_git_branch {
 user="\[\e[34;1m\]\u@\h\[\e[30;1m\]"
 
 # The number of jobs running. e.g. "job:2"
-function  PS1_opt_jobs {
-job_count=""
-	if [[ -z `jobs -sp` ]]; then echo ''; else echo -e "-(\e[34;1mjobs:$(jobs -ps | wc -l)\e[30;1m)" ;fi
-}
+PS1_opt_jobs="\$(if [[ -z \j ]]; then echo ''; else echo \"-(\[\e[34;1m\]jobs:\j\[\e[30;1m\])\" ;fi)"
+
 # The current PWD. e.g. "/home/me/documents"
 dis_path="\[\e[32;1m\]\$(pwd| sed 's:/home/stefan:~:g' | sed 's:/mnt/c/Users/Stefa:¬:g')\[\e[30;1m\]"
 
@@ -152,7 +142,7 @@ dis_path="\[\e[32;1m\]\$(pwd| sed 's:/home/stefan:~:g' | sed 's:/mnt/c/Users/Ste
 # The current branch name
 branch="\$(BRANCH=\$(ps1_git_branch); if [ \$BRANCH ]; then echo \"\[\e[30;1m\]-(\[\e[36;1m\]\$BRANCH\[\e[30;1m\])\"; fi)"
 
-PS1_line_1="\[\e[30;1m\](${user})\$(PS1_opt_jobs)-(${dis_path})"
+PS1_line_1="\[\e[30;1m\](${user})${PS1_opt_jobs}-(${dis_path})"
 PS1="${PS1_line_1}
 -(${cmd_code})${branch}-> \[\e[0m\]"
 
@@ -194,5 +184,3 @@ if [ -f $p_alias_file ]; then
 else 
     echo ".bashrc[error]: Private Alias file cannot be found at '${p_alias_file}'"
 fi
-
-PATH="/usr/sbin:${PATH}"
