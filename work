@@ -1,9 +1,0 @@
-# Current uWork Task
- - Postcode model
-   - postcode
-   - polygon
-   - centre
-   - launchedThere
- - script to seed Postcode with vornoi data
- - query to mark all SO22 and SO23 as launched (winchester PCs)
- - some method to uniformly select a random area in a given postcode

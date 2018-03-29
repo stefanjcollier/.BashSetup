@@ -1,14 +1,3 @@
-#Allows the use of gimme
-#source ~/.stools_config/gimme/gimme_function.sh
-
-# Opens the file explorer
-function open {
-   if [ -z $1 ]; then
-	nautilus .
-   else
-	nautilus $1
-   fi
-}
 
 function fix {
 	if   [[ $1 =~ 'bash' ]]; then
@@ -26,6 +15,10 @@ function fix {
 		vim ~/.bash_files/bash_functions.sh
 	elif [[ $1 =~ 'alias' ]]; then
 		vim ~/.bash_files/bash_aliases.sh
+	elif [[ $1 =~ 'vim' ]]; then
+		vim ~/.vimrc
+	elif [[ $1 =~ 'pre' ]]; then
+		vim ~/scripts/make_prebuild/make_prebuild.sh
 	elif [ "$1" == '--help' ]; then
 		echo 'fix Usage:'
 		echo '    $fix --[bash|function|alias]'
@@ -36,8 +29,66 @@ function fix {
 	. ~/.bashrc
 }
 
+
+function grab {
+	start_pattern=$1
+	end_pattern=$2
+	file=$3
+	awk "/$start_pattern/,/$end_pattern/" $file
+}
+export -f grab
+
+export HOW_IT_WORKS_SEARCH_DIR=~/.bash_files
+function howitworks {
+	# Description:
+	# 	Find the implementation of functions or aliases and colour print it to the console
+	# Usages:
+	#	$ howitworks [function name]
+	#
+	if [ -z $1 ]; then 
+		echo -e "Missing Arg 1: $ howitworks \e[31m[function name]\e[39m"
+		return 1
+	fi
+	function_name=$1
+	for file in $(find $HOW_IT_WORKS_SEARCH_DIR -type f); do
+		grabbed=$(grab "^function $function_name[ ]*{" "^}"  $file ) # grep "alias $function_name=" $file )
+		if [ -z "$grabbed" ]; then
+			grepped=$(grep "^alias $function_name=" $file)
+			if [ ! -z "$grepped" ]; then 
+				echo "$grepped"
+				found=Yes
+			fi 
+		elif [ ! -z "$grabbed" ]; then
+			echo "$grabbed" | ccat | sed 's/\t/    /g'
+			found=Yes
+		fi	
+	done
+	if [ -z $found ]; then 
+		echo -e "howitworks: \e[32m\"$function_name\"\e[39m not defined anywhere in $HOW_IT_WORKS_SEARCH_DIR"
+		return 10 
+	fi
+}
+
+
 function todo {
-	vim ~/todo.md
+	todoFile=~/.todo.md
+
+	if [ -z $1 ]; then 
+		vim $todoFile
+	else
+		header_and_footer=`cat $todoFile | grep '^#' | grep $1 -A1`
+		if [[ -z "$header_and_footer" ]]; then
+			echo '$1 Did not match any section'
+			return 1
+		fi
+
+		sep_header_and_footer=`echo $header_and_footer | sed 's/##*/#/g'| sed 's/^#//g'`
+		
+		header=`echo $sep_header_and_footer | awk -F'#' '{print $1}' | sed 's/[ ]*$//' | sed 's/^[ ]*//g'`
+		footer=`echo $sep_header_and_footer | awk -F'#' '{print $2}' | sed 's/[ ]*$//' | sed 's/^[ ]*//g'`
+
+		cat $todoFile | grep "${header}" -A100 | grep "${footer}" -B100 | head -n -1
+	fi
 }
 
 
@@ -51,4 +102,45 @@ alias find_logs_deprecated='echo Finding console.log statements!; for file in $(
 alias find_logs="echo; echo Finding console.logs!; echo; ag -Q console.log -B 2 -A 2 || echo None Found "
 alias find_log=find_logs
 alias find_console=find_logs
+
+function log {
+	logfile="$(date +%Y-%m-%d).log"
+	$@ 2> $logfile
+}
+
+function do_stuff {
+	for file in $($1); do echo "========[ ${file} ]========"; $2 ; done
+}
+
+function compile_notes {
+ 	readme=~/.notes/readme.md;
+	echo "# Notes Homepage" > $readme
+	for file in $(ls -1 | grep .md | grep -v readme.md); do
+		title=$(cat $file | head -n1 | sed 's/^[# ]*//');
+		echo " - [$title](./$file)" >> $readme; 
+	done 
+}
+
+function _notes_text {
+	text=$(echo $@ |  sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
+	echo $text
+}
+
+function create_notes {
+	text=$(_notes_text $@)
+	today=$(date +%Y-%m-%d)
+	filename=~/.notes/${today}_${text}.md
+	touch $filename
+	echo "# $@" > $filename
+}
+
+function find_notes {
+	text=$(echo $@ |  sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
+	find ~/.notes/ -name "*$text*"
+}
+
+function notes {
+	echo
+}
+
 
