@@ -49,22 +49,27 @@ function howitworks {
 		echo -e "Missing Arg 1: $ howitworks \e[31m[function name]\e[39m"
 		return 1
 	fi
-	function_name=$1
+	found=
+	command_name=$1
 	for file in $(find $HOW_IT_WORKS_SEARCH_DIR -type f); do
-		grabbed=$(grab "^function $function_name[ ]*{" "^}"  $file ) # grep "alias $function_name=" $file )
-		if [ -z "$grabbed" ]; then
-			grepped=$(grep "^alias $function_name=" $file)
-			if [ ! -z "$grepped" ]; then 
-				echo "$grepped"
-				found=Yes
-			fi 
-		elif [ ! -z "$grabbed" ]; then
-			echo "$grabbed" | ccat | sed 's/\t/    /g'
+
+		# Find any matching functions
+		function_def=$(grab "^function $command_name[ ]*{" "^}"  $file )
+		if [ ! -z "$function_def" ]; then
+			echo "$function_def" | ccat | sed 's/\t/    /g'
 			found=Yes
-		fi	
+		fi
+		
+		# Find any matching alias
+		alias_def=$(grep "^alias $command_name=" $file)
+		if [ ! -z "$alias_def" ]; then 
+			echo "$alias_def"
+			found=Yes
+		fi 
+		
 	done
 	if [ -z $found ]; then 
-		echo -e "howitworks: \e[32m\"$function_name\"\e[39m not defined anywhere in $HOW_IT_WORKS_SEARCH_DIR"
+		echo -e "howitworks: \e[32m\"$command_name\"\e[39m not defined anywhere in $HOW_IT_WORKS_SEARCH_DIR"
 		return 10 
 	fi
 }

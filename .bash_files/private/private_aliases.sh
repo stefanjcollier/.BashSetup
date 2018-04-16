@@ -107,3 +107,22 @@ function jqenums {
 		done | sort | uniq -c ;
 	done
 }
+
+
+function jqtypes {
+	if [ -z $1 ]; then 
+		echo "Missing first arg: jqlens \e[31m[attrs file]\e[39m [instrument string]"
+		echo "    e.g jqtypes jqattributes.txt Conn"
+		echo
+		echo "Where each line in the file is like so:"
+		echo ".properties.Attributes.properties.ReturnorPayoutTrigger"
+		return 1
+	fi
+	for line in $(cat $1) ; do
+		echo -en "$(echo $line | sed 's/.*[.]//g')\t"
+		cat /home/user/scollier/downloads/LOADS_OF_DSB_RECORDS/schemas/$2* | jq "${line}.type" 2> /dev/null | grep -v null  | sort | uniq | sed 's/"//g' | sed 's/\n/|/g'
+	
+	done
+}
+
+
