@@ -8,20 +8,12 @@ alias fxd2='ssh fx-devel2'
 alias fxa=fxd1
 alias fxb=fxd2
 
-
 alias src='source X86_64/environment.sh'
 
 alias python=python3
 alias pip=pip3
 
 export PATH="${HOME}/.local/bin:${PATH}"
-
-alias rktest='__rk_ build'
-function __rk_ {
-  echo -e "\e[7m\e[34m$ rakefds -${1}\e[0m";
-  compiled_command='echo Now run the command'
-  rakefds -$1 && $compiled_command
-}
 
 alias dbl_event_logger='perl /home/fonix/prd_progs/tools/dbl/dbl_event_logger.pl'
 
@@ -31,15 +23,20 @@ alias perldocs=perldoc
 alias review='perl /home/data/index/script/common/submit_review_board.pl'
 alias mu_it='/home/fonix/prd_progs/tools/mu_utils/mu_it.pl'
 
-alias messenger=/home/user/scollier/node_modules/fb-messenger-cli/cli.js
-
 prd_progs=/home/fonix/prd_progs/
 
-alias make_prebuild='~/scripts/make_prebuild/old_bash/make_prebuild.sh'
+
+# Scripts I made
+alias make_prebuild='~/scripts/make_prebuild/old_bash/make_prebuild.sh'  # Incomplete
 alias mpre=make_prebuild
 
 alias show_diffs='/home/user/scollier/scripts/show_diffs/show_diffs.sh'
 alias find_diffs=show_diffs
+
+# -------------------------------
+#  --- [ Personal @ FactSet] ---  
+# -------------------------------
+alias messenger=/home/user/scollier/node_modules/fb-messenger-cli/cli.js
 
 # -----------------------
 # --- [ DSB Methods ] ---

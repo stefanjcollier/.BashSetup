@@ -1,5 +1,13 @@
-
+# ---------------------------------------------------------------------------------------------------
+#  Fix
+# ---------------------------------------------------------------------------------------------------
 function fix {
+	# Description:
+	#	Stefan's method for editing functions and aliases 
+	# Usages:
+	#	$ fix [bash/func/alias/vim]
+	#	$ fix <priv> [func/alias]
+	#
 	if   [[ $1 =~ 'bash' ]]; then
 		vim ~/.bashrc
 	elif [[ $1 =~ 'priv' ]]; then 
@@ -29,8 +37,16 @@ function fix {
 	. ~/.bashrc
 }
 
-
+# ---------------------------------------------------------------------------------------------------
+#  Grab
+# ---------------------------------------------------------------------------------------------------
 function grab {
+	# Description:
+	# 	Select over multlines (i.e. multiline grep)
+	# Usages:
+	#	$ grab [start pattern] [end pattern] [file]
+	#	$ cat [file] | grab [start pattern] [end pattern]
+	#
 	start_pattern=$1
 	end_pattern=$2
 	file=$3
@@ -38,6 +54,11 @@ function grab {
 }
 export -f grab
 
+# ---------------------------------------------------------------------------------------------------
+#  How It Works
+# ---------------------------------------------------------------------------------------------------
+# Dependencies:
+#	- grab
 export HOW_IT_WORKS_SEARCH_DIR=~/.bash_files
 function howitworks {
 	# Description:
@@ -73,14 +94,22 @@ function howitworks {
 		return 10 
 	fi
 }
+alias howitwork=howitworks
+alias hiw=howitworks
+alias how=howitworks
+export howitworks
 
 
+# ---------------------------------------------------------------------------------------------------
+#  Todo
+# ---------------------------------------------------------------------------------------------------
 function todo {
 	todoFile=~/.todo.md
 
 	if [ -z $1 ]; then 
 		vim $todoFile
 	else
+		# Find that section
 		header_and_footer=`cat $todoFile | grep '^#' | grep $1 -A1`
 		if [[ -z "$header_and_footer" ]]; then
 			echo '$1 Did not match any section'
@@ -116,36 +145,3 @@ function log {
 function do_stuff {
 	for file in $($1); do echo "========[ ${file} ]========"; $2 ; done
 }
-
-function compile_notes {
- 	readme=~/.notes/readme.md;
-	echo "# Notes Homepage" > $readme
-	for file in $(ls -1 | grep .md | grep -v readme.md); do
-		title=$(cat $file | head -n1 | sed 's/^[# ]*//');
-		echo " - [$title](./$file)" >> $readme; 
-	done 
-}
-
-function _notes_text {
-	text=$(echo $@ |  sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
-	echo $text
-}
-
-function create_notes {
-	text=$(_notes_text $@)
-	today=$(date +%Y-%m-%d)
-	filename=~/.notes/${today}_${text}.md
-	touch $filename
-	echo "# $@" > $filename
-}
-
-function find_notes {
-	text=$(echo $@ |  sed 's/ /_/g' | tr '[:upper:]' '[:lower:]')
-	find ~/.notes/ -name "*$text*"
-}
-
-function notes {
-	echo
-}
-
-
