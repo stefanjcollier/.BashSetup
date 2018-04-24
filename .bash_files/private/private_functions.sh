@@ -1,17 +1,21 @@
-
-# Name:
-#	pedit
-#
-# Description:
-# 	p4 edit overlay that handles the manipulation of files, making your life easier.
-# 
-# Usage:
-#	pedit <filename>	# Opens the file for editing
-#	pedit --clean		# Removes all the 'hidden' files used to check
-#				  if the file should be added
-#
+# ---------------------------------------------------------------------------------------------------
+#  Perforce Edit
+# ---------------------------------------------------------------------------------------------------
+# Dependencies:
+#	- p4  # perforce
 #
 function pedit {
+	# Name:
+	#	pedit
+	#
+	# Description:
+	# 	p4 edit overlay that handles the manipulation of files, making your life easier.
+	# 
+	# Usage:
+	#	pedit <filename>	# Opens the file for editing
+	#	pedit --clean		# Removes all the 'hidden' files used to check
+	#				  if the file should be added
+	#
 	if [[ -z "$1" ]]; then 
 		# Print usage
 		echo "pedit:Usage:"
@@ -48,19 +52,25 @@ function pedit {
 	fi
 }
 
-#
-# Name:
-#	Kill Service	
-#
-# Description:
-#	(To be used on the unixdev09) Kills the service that matches the name in \$PS_SERVICE
-# 
-# Usage:
-#	$ pskill 			# Kills the service
-#	$ pskill --help 	# Displays help (including PS_SERVICE value)
+# ---------------------------------------------------------------------------------------------------
+#  Process Killer
+# ---------------------------------------------------------------------------------------------------
+# Dependencies:
+#  - env variable: PS_SERVICE
 #
 export PS_SERVICE='stefan.fcgi'
 function pskill {
+	# Name:
+	#	Kill Service	
+	#
+	# Description:
+	#	(To be used on the unixdev09) Kills the service that matches the name in \$PS_SERVICE
+	# 
+	# Usage:
+	#	$ pskill 				# Kills the previously killed service
+	#	$ pskill [pattern]		# Kills the service matching the pattern
+	#	$ pskill --help 		# Displays help (including PS_SERVICE value)
+	#
 	if [[ "$1" == "--help" ]]; then
 		echo "Usage: \$ perkill "
 		echo "Kills the process that matches the contents of \$PS_SERVICE"
@@ -77,10 +87,13 @@ function pskill {
 	if [[ -z $service_pid ]]; then
 		echo "Service '${PS_SERVICE}' is not running" >&2
 		return 1
+	
+	# If there is more than one option that matches you search criteria
 	elif (( $(echo $service_pid | wc -w) > 1 )); then 
 		echo -e "\e[31mMore than one service matches that criteria '${PS_SERVICE}':\e[0m "
 		# Show all the options with option numbers 
 		ps -ef | grep ${PS_SERVICE} | grep -v grep | awk 'BEGIN{line=0; print "     user\tPID\tCommand"}{print " [" line++ "] " $1 "\t" $2 "\t" $NF "\t\t(" $(NF-1) ")"}'
+
 		# Get user line choice
 		echo "Choose a ${PS_SERVICE} to kill... (e.g. 1)"; 
 		trap "echo '...Leaving pskill'; return 2" INT  # Allow for a nice leave 
@@ -100,46 +113,42 @@ function pskill {
 			(kill $service_pid && echo -e "\e[7m\e[34m\$ kill ${service_pid}\e[0m\e[34m # i.e. \$ kill ${service_name}\e[0m ") || echo -e "\e[31mCould not kill ${service_name}\e[0m"
 			return 0
 		fi
+	# Could not find a matching process
 	else
 		(kill $service_pid && echo -e "\e[7m\e[34m\$ kill ${service_pid}\e[0m\e[34m # i.e. \$ kill ${service_name}\e[0m ") || echo -e "\e[31mCould not kill ${service_name}\e[0m"
 		return 0
 fi
 }
 
-function pop {
-read option
-echo "-----[ $option ]----"
-}
 
-#
-# Name:
-#  find_opened
-# 
-# Description:
-#	Finds the path for all the files that are in $p4 opened
-#
-# Usage:
-#	$ find_opened 			# prints paths to all files in p4 opened
-#	$ find_opened [args]	# same command as before but passes args into p4 opened
+# ---------------------------------------------------------------------------------------------------
+#  Perforce Opened File Finder
+# ---------------------------------------------------------------------------------------------------
+# Dependencies:
+#  - pf  # perforce
 #
 function find_opened {
-pf opened $@ | sed 's:/.*/::g' | awk -F '#' '{print $1}' | xargs -n1 find . -name
+	# Name:
+	#  find_opened
+	# 
+	# Description:
+	#	Finds the path for all the files that are in $p4 opened
+	#
+	# Usage:
+	#	$ find_opened 			# prints paths to all files in p4 opened
+	#	$ find_opened [args]	# same command as before but passes args into p4 opened
+	#
+	pf opened $@ | sed 's:/.*/::g' | awk -F '#' '{print $1}' | xargs -n1 find . -name
 }
 alias find_open=find_opened
 alias opened=find_opened
 
-
-
-function pfqlf {
-for line in key=$(fqlf $1); do
-	key=$(echo $line | awk -F '=' '{print $1}')
-	val=$(echo $line | awk -F '=' '{$1=""; print $0}')
-	#	echo -e "\e[34m$key\e[0m=$val"
-	echo $line
-done
-}
-
-
+# ---------------------------------------------------------------------------------------------------
+#  Perforce Opened File Finder
+# ---------------------------------------------------------------------------------------------------
+# Dependencies:
+#  - quetex  #
+#
 my_qtx_file=~/.my_quetexes.txt
 function qtx {
 	if [[ "$1" =~ "mine" ]]; then 
@@ -152,3 +161,41 @@ function qtx {
 	fi
 }
 
+# ---------------------------------------------------------------------------------------------------
+#  Draw Wombat
+# ---------------------------------------------------------------------------------------------------
+blue=$(tput setaf 4)
+normal=$(tput sgr0)
+
+
+A_WIDTH=64
+
+function draw_inner {
+	header=$1
+	body=$2
+	header_width=$3
+	if [ -z $3 ]; then 
+		header_width=${#header}
+	fi
+
+	inner_line=$(printf -v res %$(($A_WIDTH - $header_width))s; printf '%s'  "${res// /─}")
+	printf "┃ %-${header_width}s ┌${inner_line}┐  ┃\n" ""
+	printf "┃ %-$(($A_WIDTH + 3))s │  ┃\n" "$(printf "%-${header_width}s │ %s" "$header" "$body")"
+	printf "┃ %-${header_width}s └${inner_line}┘  ┃\n"
+}
+
+function draw_activity {
+	activity=$1
+	meta=$2
+	file=$3
+	
+	blue_activity="${blue}${activity}${normal}"
+
+	echo -e "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+	printf  '┃ %-79s ┃\n' "$blue_activity - $meta"
+	draw_inner "File" "$file"
+	echo -e "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+#	printf '| %-6s + %-50s + |' 'File' '/path/to/file.pl'   #<-- this is a demo
+
+
+}  
