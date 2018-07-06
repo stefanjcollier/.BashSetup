@@ -161,41 +161,268 @@ function qtx {
 	fi
 }
 
+
+# ---------------------------------------------------------------------------------------------------
+#  ASB/DSB/ESMA Stuff
+# A collecion of functions to make manual testing and whatnot easier
+# ---------------------------------------------------------------------------------------------------
+alias goto-asb='cd /home/user/scollier/symbology/prd-progs-sym-feed-anna/asb'
+alias goto-dsb='cd /home/user/scollier/symbology/prd-progs-sym-feed-anna/dsb'
+alias goto-esma='cd /home/user/scollier/symbology/prd-progs-sym-feed-anna/esma'
+
+function what-mode {
+	echo "In ${ANNA_MODE} mode"
+}
+alias anna-mode=what-mode
+function activate-asb {
+	export ANNA_MODE=ASB
+	what-mode
+}
+function activate-dsb {
+	export ANNA_MODE=DSB
+	what-mode
+}
+function activate-esma {
+	export ANNA_MODE=ESMA
+	what-mode
+}
+
+process() (
+	usage() {
+		echo "    please use 'activate-asb' or 'activate-dsb' or 'activate-esma' to select a mode"
+	}
+
+	if [ -z "$ANNA_MODE" ]; then
+		echo "Mode Not Set"
+		usage
+		return 1
+	fi
+	case $ANNA_MODE in
+		ASB)
+			process_script=/home/user/scollier/symbology/prd-progs-sym-feed-anna/asb/asb_daily_process/create_asbdaily_bcp_files.py
+			;;
+		DSB)
+			process_script=/home/user/scollier/symbology/prd-progs-sym-feed-anna/dsb/dsb_daily_process/create_dsbdaily_bcp_files.py
+			;;
+		ESMA)
+			process_script=/home/user/scollier/symbology/prd-progs-sym-feed-anna/esma/esma_daily_process/create_esmadaily_bcp_files.py
+			;;
+		*)
+			echo "Unrecognised mode: '${ANNA_MODE}'"
+			usage
+			return 2
+		;;
+	esac
+	pygd sym_mgr --quiet
+	PYTHONPATH="/home/user/scollier/symbology/prd-progs-sym-feed-anna/lib:${PYTHONPATH}"
+	python3 $process_script $@
+)
+
+function archive-anna { 
+	if [ -z $1 ]; then
+		local env=dev
+	else
+		local env=$1
+	fi
+	case $env in
+		dev)
+			cd /home/fonix/data2/sym/archive/anna
+			;;
+		stg)
+			cd /home/fonix/data2/sym/stg/sym_feed_anna
+			;;
+		prod)
+			cd /home/data/vmsarc/sym/anna
+			;;
+		*)
+			echo "Unrecognised environment ${env}, support envs are: dev/stg/prod"
+			exit 1
+		;;
+	esac
+}
+
+# ---------------------------------------------------------------------------------------------------
+#  DSB Stuff
+# ---------------------------------------------------------------------------------------------------
+function dtouch {
+	cd $1
+	date=$2
+	touch Credit-${date}.records
+	touch Commodities-${date}.records
+	touch Equity-${date}.records
+	touch Foreign_Exchange-${date}.records
+	touch Rates-${date}.records
+}
+
+
+
+# ---------------------------------------------------------------------------------------------------
+#  ESMA Stuff
+# ---------------------------------------------------------------------------------------------------
+function get_esma_files_date {
+	local date=$1 # Expected format: YYYY-MM-DD
+	local short_date=$(echo $1 | sed 's/-//g')
+	local catalog_file=esma_catalog_${date}.json
+
+	# Download the page that shows what is available between 00:00 and midnight of the given date
+	echo "====================================================="
+	echo "                    CATALOG"
+	echo "====================================================="
+	echo "Downloading catalog for date $date"
+	wget -nv "https://registers.esma.europa.eu/solr/esma_registers_firds_files/select?q=*&fq=publication_date:[${date}T00:00:00Z+TO+${date}T23:59:59Z]&wt=json&indent=true&start=0&rows=100" -O $catalog_file 
+	cat $catalog_file
+	echo
+
+	# Find all download links for the DELTA files (not the 
+	echo "====================================================="
+	echo "           DOWNLOADING ALL FILES"
+	echo "====================================================="
+	echo "Downloading all files for given date"
+	for delta_file_url in $(grep -o 'http://.*zip' $catalog_file | grep 'FULINS'); do
+		printf '  - '
+		wget -nv $delta_file_url
+		echo 
+	done
+
+	echo "====================================================="
+	echo "           EXTRACT & FORMAT DATA"
+	echo "====================================================="
+	echo "Unzipping files and formatting results"
+	total_instruments=0
+
+	for zip_file in $(ls -1 | grep ${short_date} ); do
+		echo "-----------------------------------------------------"
+		echo "           $zip_file"
+		echo "-----------------------------------------------------"
+		local xml_file=$(echo $zip_file | sed 's/.zip$/.xml/')
+		local formatted_xml_file=$(echo $zip_file | sed 's/.zip$/.formatted.xml/')
+		
+		if [ -e $formatted_xml_file ]; then 
+			# We already have downloaded this file
+			echo "SKIPPING EXTRACTION -  already downloaded"
+			echo 
+			echo
+			continue
+		fi
+
+		unzip $zip_file
+		echo
+
+		xmllint --format $xml_file > $formatted_xml_file
+		echo
+	
+		if [ "$2" == "--clean" ] || [ "$2" == "--cleanup" ] || [ "$3" == "--clean" ] || [ "$3" == "--cleanup" ] ;then
+			echo "Cleaning all processing files, deleting:"
+			echo "  - $zip_file"
+			rm $zip_file
+
+			echo "  - $xml_file"
+			rm $xml_file 
+
+			if [ -e $catalog_file ]; then 
+				# The file will not exit round the second time and then error
+				echo "  - $catalog_file"
+				rm $catalog_file
+			fi	
+			echo
+		fi
+		
+		echo "--[ Results ]--"
+		new_instruments=$(grep -c '<FullNm>' $formatted_xml_file)
+		echo "Datafile: $formatted_xml_file"
+		echo "Instruments: $new_instruments"
+		echo
+		total_instruments=$(( $total_instruments + $new_instruments ))
+
+	done
+	echo "====================================================="
+	echo "                       DONE!" 
+	echo "====================================================="
+	echo "Total instruments to process: $total_instruments"
+}
+export -f get_esma_files_date
+
+
+function get_esma_files_date_range {
+	local start_date=$1
+	local end_date=$2
+	
+	local day=$start_date
+	while [[ $day != $end_date ]]; do
+		get_esma_files $day --cleanup
+
+	    local day=$(date -I -d "$day + 1 day")
+	done
+}
+
+
+
 # ---------------------------------------------------------------------------------------------------
 #  Draw Wombat
 # ---------------------------------------------------------------------------------------------------
 blue=$(tput setaf 4)
 normal=$(tput sgr0)
+export normal
+export blue
 
+W_WIDTH=90
+export W_WIDTH
 
-A_WIDTH=64
+function W_repeat {
+	# Repeat the input arg $W_WIDTH times
+	local char=$1
+	if [ -z $2 ]; then
+		local width=$W_WIDTH
+	else
+		local width=$2
+	fi
+	printf -v res %${width}s; printf '%s'  "${res// /${char}}"
+}
+export -f W_repeat
 
 function draw_inner {
-	header=$1
-	body=$2
-	header_width=$3
-	if [ -z $3 ]; then 
-		header_width=${#header}
-	fi
-
-	inner_line=$(printf -v res %$(($A_WIDTH - $header_width))s; printf '%s'  "${res// /─}")
+	local header=$1
+	local body=${@:2}  # Cheeky array operator: skip the first two elements
+	header_width=${#header}  # Cheeky String Operator usage (y)
+	
+	local inner_line=$(W_repeat '─' $(($W_WIDTH - $header_width - 6)) )
 	printf "┃ %-${header_width}s ┌${inner_line}┐  ┃\n" ""
-	printf "┃ %-$(($A_WIDTH + 3))s │  ┃\n" "$(printf "%-${header_width}s │ %s" "$header" "$body")"
+	printf "┃ %-$(($W_WIDTH - 3))s │  ┃\n" "$(printf "%-${header_width}s │ %s" "$header" "$body")"
 	printf "┃ %-${header_width}s └${inner_line}┘  ┃\n"
 }
+export -f draw_inner
+
+function draw_top {
+	local activity=$1
+	local meta=${@:2}	
+
+	# Top Line
+	local outer_line=$(W_repeat '━')
+	echo -e "┏${outer_line}┓"
+
+	# Header
+	local blue_activity="${blue}${activity}${normal}"
+	printf  "┃ %-$(($W_WIDTH + 9))s ┃\n" "$blue_activity - $meta"
+}
+export -f draw_top
+
+function draw_bottom {
+	local outer_line=$(W_repeat '━')
+	echo -e "┗${outer_line}┛"
+}
+export -f draw_bottom
+
+
 
 function draw_activity {
-	activity=$1
-	meta=$2
-	file=$3
-	
-	blue_activity="${blue}${activity}${normal}"
-
-	echo -e "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	printf  '┃ %-79s ┃\n' "$blue_activity - $meta"
+	local activity=$1
+	local meta=$2
+	local file=$3
+	draw_top "$activity" "$meta"
 	draw_inner "File" "$file"
-	echo -e "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-#	printf '| %-6s + %-50s + |' 'File' '/path/to/file.pl'   #<-- this is a demo
-
-
+	draw_bottom
 }  
+export -f draw_activity
+
+
+

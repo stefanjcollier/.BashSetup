@@ -20,7 +20,11 @@ function fix {
 			echo '            $fix private [function|alias]'
 		fi
 	elif [[ $1 =~ 'func' ]]; then
-		vim ~/.bash_files/bash_functions.sh
+		if [[ ! -z $2 ]]; then 
+			__fix__func $2	
+		else
+			vim ~/.bash_files/bash_functions.sh
+		fi
 	elif [[ $1 =~ 'alias' ]]; then
 		vim ~/.bash_files/bash_aliases.sh
 	elif [[ $1 =~ 'vim' ]]; then
@@ -36,6 +40,73 @@ function fix {
 	fi
 	. ~/.bashrc
 }
+
+# ----[ Initialise the command ]-----
+FUNCTION_FOLDER=~/.bash_files/functions
+if [ ! -d $FUNCTION_FOLDER ]; then 
+	mkdir -p $FUNCTION_FOLDER
+fi
+
+IMPORT_FUNC_FILE=~/.bash_files/bash_functions.sh
+
+
+
+# ----[ Helper functions ]-----
+function function_exists {
+	type $1 1> /dev/null 2> /dev/null
+}
+
+function file_exists {
+	if [ -f $1 ]; then 
+		return 0
+	else
+		return 1
+	fi
+}
+function __fix__func__is_new_func {
+	function_exists $1 && ! file_exists $2 
+}
+
+function __fix__func {
+	func_name=$1
+	func_file=$FUNCTION_FOLDER/${func_name}.sh
+
+	# ---[ Pre Checks ]---
+	# Ensure the name is not taken when making a new function
+	is_new_file=
+	if ! file_exists $func_file; then
+		is_new_file=True
+
+		if function_exists $func_name; then
+			echo -e "The name '${func_name}' is already taken"
+			return 1
+		fi
+	fi
+	
+	#---[ Edit/Make function ]---
+	# edit function file
+	vim $func_file
+	
+	# ---[ Post Checks ]---
+	if [ ! -s $func_file  ]; then
+		echo "Nothing was written for $func_name"
+		return 2 
+	fi
+
+	# TODO: post check: check for any exit commands
+
+	# add alias if it's new 
+	#---[ Add alias ]---
+	if [ ! -z $is_new_file ]; then 
+		echo "Adding '${func_name}' to alias file"
+		echo "" >> IMPORT_FUNC_FILE
+		echo "alias='${func_file}'" >> IMPORT_FUNC_FILE
+	fi
+	#TODO: Determine the best way to import the functions
+ 		
+}
+
+
 
 # ---------------------------------------------------------------------------------------------------
 #  Grab
@@ -61,23 +132,23 @@ export -f grab
 #	- grab
 export HOW_IT_WORKS_SEARCH_DIR=~/.bash_files
 function howitworks {
-	# Description:
+  	# Description:
 	# 	Find the implementation of functions or aliases and colour print it to the console
 	# Usages:
-	#	$ howitworks [function name]
+	#	$ howitworks [command name]
 	#
 	if [ -z $1 ]; then 
 		echo -e "Missing Arg 1: $ howitworks \e[31m[function name]\e[39m"
 		return 1
 	fi
-	found=
+	found=	# initially empty
 	command_name=$1
 	for file in $(find $HOW_IT_WORKS_SEARCH_DIR -type f); do
 
-		# Find any matching functions
-		function_def=$(grab "^function $command_name[ ]*{" "^}"  $file )
+		# Find any matching functions that are defined via 'function'
+		function_def=$(grab "^\s*function $command_name[ ]*{" "^}"  $file )
 		if [ ! -z "$function_def" ]; then
-			echo "$function_def" | ccat | sed 's/\t/    /g'
+			echo "$function_def" | ccat -l bash | sed 's/\t/    /g'
 			found=Yes
 		fi
 		
@@ -86,18 +157,27 @@ function howitworks {
 		if [ ! -z "$alias_def" ]; then 
 			echo "$alias_def"
 			found=Yes
-		fi 
+		fi
+
+		# attempt `which`
+		which_def=$(which $command_name 2> /dev/null)
+		if [ ! -z "$which_def" ]; then
+			echo -e "\e[32m${command_name}\e[39m found to be \e[33m${which_def}\e[39m"
+			found=Yes
+			break
+		fi
 		
 	done
 	if [ -z $found ]; then 
-		echo -e "howitworks: \e[32m\"$command_name\"\e[39m not defined anywhere in $HOW_IT_WORKS_SEARCH_DIR"
+		echo -e "howitworks: \e[31m\"$command_name\"\e[39m not defined anywhere in $HOW_IT_WORKS_SEARCH_DIR"
 		return 10 
 	fi
 }
+export howitworks
+
 alias howitwork=howitworks
 alias hiw=howitworks
 alias how=howitworks
-export howitworks
 
 
 # ---------------------------------------------------------------------------------------------------

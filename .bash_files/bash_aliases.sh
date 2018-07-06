@@ -10,6 +10,7 @@ alias cd.....='cd ../../../../..'
 alias l1='ls -1'
 alias l1t='ls -1tr'
 alias li='ls -i1sAB'
+alias lg='l1 | grep'
 
 alias VIM=vim
 
@@ -34,11 +35,19 @@ alias ocat=_cat
 alias bcat=_cat
 
 #----[ String Funcs ]----
+function lower { 
+	echo "$@" | tr [A-Z] [a-z] 
+}
+alias lc=lower
+function upper { 
+	echo "$@" | tr [a-z] [A-Z] 
+}
+alias uc=upper
+
+
 #function line_lens {
 #	echo $@ | awk '{ print length, $0}' | sort -nr 
 #}
-
-
 
 alias pingme='ping www.google.com'
 alias pinggoogle=pingme
@@ -48,22 +57,23 @@ alias ip=ipython
 alias bp=bpython
 
 #----[ Stefans Git Commands ]---- 
-alias g='clear; git '
+alias g='clear; git'
 alias gs='clear; git status'
 alias gl='clear; git log --pretty=oneline --abbrev-commit --all' 
-alias glg='clear; git log --pretty=oneline --abbrev-commit --all --graph --decorate' 
-alias gp='echo git pushing; git push'
-alias gpu=gp
+alias g10='clear; git log --pretty=oneline --abbrev-commit --all -n10' 
+alias glg='clear; git log --pretty=oneline --abbrev-commit --all --graph' 
+alias gp='echo git pushing; git push;'
+alias gpu='git push'
 alias gps='git push'
 alias gpl='git pull'
 alias gc='git commit'
-alias gac='git add .;git commit'
-alias ghelp='alias | grep git'
-alias giff='git diff'
+alias gac='git add .; git commit'
 alias gb='git branch'
+alias ghelp='alias | grep git'
+alias gdiff='git diff'
+function gprune {
+	git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}');
+          do git branch -D $branch;
+    done
+}
 
-#----[ Stefan Defined Scripts ]----
-alias google='echo Not Imported Yet'
-
-# Find the date of a site
-# https://www.google.co.uk/search?q=inurl:<url>&as_qdr=y15

@@ -9,6 +9,7 @@ alias fxa=fxd1
 alias fxb=fxd2
 
 alias src='source X86_64/environment.sh'
+alias scratch='cd /home/dev/scratch/developers/scollier'
 
 alias python=python3
 alias pip=pip3
@@ -23,6 +24,10 @@ alias perldocs=perldoc
 alias review='perl /home/data/index/script/common/submit_review_board.pl'
 alias mu_it='/home/fonix/prd_progs/tools/mu_utils/mu_it.pl'
 
+
+alias edit_wombat='perl /home/fonix/prd_progs/tools/wombat/utils/workflow_edit/workflow_edit.pl'
+alias download_workflow='edit_wombat --command=download --fetch_type=workflow --user_env=development --driver=./driver'
+alias wombat2xml='python ~/scripts/wombatxmltocsv.py'
 prd_progs=/home/fonix/prd_progs/
 
 
@@ -32,15 +37,20 @@ alias mpre=make_prebuild
 
 alias show_diffs='/home/user/scollier/scripts/show_diffs/show_diffs.sh'
 alias find_diffs=show_diffs
+alias mssql_table_name='perl /home/user/scollier/sym_sql_migration_tools/mssql_table_name.pl'
+alias table_name=mssql_table_name
 
+
+alias qq='sh /home/user/dnamufetha/symbology/scripts/page_res/quetex_stats.sh'
+alias qqs='sh /home/user/scollier/scripts/quetex_stats/quetex_stats.sh'
 # -------------------------------
 #  --- [ Personal @ FactSet] ---  
 # -------------------------------
 alias messenger=/home/user/scollier/node_modules/fb-messenger-cli/cli.js
 
-# -----------------------
-# --- [ DSB Methods ] ---
-# -----------------------
+# -------------------------------
+# --- [ JSON Schema Methods ] ---
+# -------------------------------
 function jqlens {
 	if [ -z $1 ]; then 
 		echo "Missing first arg: jqlens [jpath] "
