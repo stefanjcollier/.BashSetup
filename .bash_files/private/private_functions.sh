@@ -144,13 +144,13 @@ alias find_open=find_opened
 alias opened=find_opened
 
 # ---------------------------------------------------------------------------------------------------
-#  Perforce Opened File Finder
+#  Old QTX command
 # ---------------------------------------------------------------------------------------------------
 # Dependencies:
 #  - quetex  #
 #
 my_qtx_file=~/.my_quetexes.txt
-function qtx {
+function qtxpp {
 	if [[ "$1" =~ "mine" ]]; then 
 		cat $my_qtx_file | tr '[:upper:]' '[:lower:]'
 		echo;
@@ -160,6 +160,8 @@ function qtx {
 		quetex $@
 	fi
 }
+alias oqtx=qtxpp
+alias lqtx=qtxpp
 
 
 # ---------------------------------------------------------------------------------------------------
@@ -187,7 +189,7 @@ function activate-esma {
 	what-mode
 }
 
-process() (
+function process() (
 	usage() {
 		echo "    please use 'activate-asb' or 'activate-dsb' or 'activate-esma' to select a mode"
 	}
@@ -197,6 +199,7 @@ process() (
 		usage
 		return 1
 	fi
+	local process_script=''
 	case $ANNA_MODE in
 		ASB)
 			process_script=/home/user/scollier/symbology/prd-progs-sym-feed-anna/asb/asb_daily_process/create_asbdaily_bcp_files.py
@@ -218,6 +221,36 @@ process() (
 	python3 $process_script $@
 )
 
+function download() (
+	usage() {
+		echo "    please use 'activate-asb' or 'activate-dsb' or 'activate-esma' to select a mode"
+	}
+
+	if [ -z "$ANNA_MODE" ]; then
+		echo "Mode Not Set"
+		usage
+		return 1
+	fi
+	case $ANNA_MODE in
+		ASB)
+			echo "Download not made for ASB"
+			;;
+		DSB)
+			echo "Download not made for DSB"
+			;;
+		ESMA)
+			sh /home/user/scollier/symbology/prd-progs-sym-feed-anna/esma/esma_daily_download/download_daily_esma_files.sh $@
+			;;
+		*)
+			echo "Unrecognised mode: '${ANNA_MODE}'"
+			usage
+			return 2
+		;;
+	esac
+	
+
+)
+
 function archive-anna { 
 	if [ -z $1 ]; then
 		local env=dev
@@ -232,7 +265,7 @@ function archive-anna {
 			cd /home/fonix/data2/sym/stg/sym_feed_anna
 			;;
 		prod)
-			cd /home/data/vmsarc/sym/anna
+			cd /home/archive/sym/anna
 			;;
 		*)
 			echo "Unrecognised environment ${env}, support envs are: dev/stg/prod"

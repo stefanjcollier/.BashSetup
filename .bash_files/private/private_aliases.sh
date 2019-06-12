@@ -1,48 +1,147 @@
-alias rkr='echo -e "\e[7m\e[34m$ rakefds -release\e[0m"; rakefds -release'
-alias rkd='echo -e "\e[7m\e[34m$ rakefds -debug\e[0m"; rakefds -debug'
-alias rkb='echo -e "\e[7m\e[34m$ rakefds -build\e[0m"; rakefds -build'
 
-alias dbops='sudo -u sym_mgr /home/fonix/prd_progs/tools/db_ops/db_ops.sh' 
+debug () {
+    if [ ! -z $DEBUG ] && [ $DEBUG -ne 0 ]; then
+        echo 'DEBUG>>' $@ | sed 's|\n|\nDEBUG>>|g'  >&2
+    fi
+}
+# --------------------------------
+#   ---  [ SSH-ing ]  ---  
+# --------------------------------
 alias fxd1='ssh fx-devel1'
 alias fxd2='ssh fx-devel2'
 alias fxa=fxd1
 alias fxb=fxd2
+alias fxdev='ssh fx-devel'
+alias fxdevc=fxdev
+alias fxc=fxdev
 
-alias src='source X86_64/environment.sh'
+export VMSA='fdsa::'
+export VMSB='fdsb::'
+export VMSC='fdsc::'
+
 alias scratch='cd /home/dev/scratch/developers/scollier'
+alias goto-equity='cd /home/user/scollier/symbology/prd-progs-sym-equity'
+alias goto-notify='cd /home/user/scollier/symbology/prd-progs-sym-equity/notify'
+
+function leg () {
+	debug "\$1 = $1"
+	if [ -z "$1" ]; then
+		echo "No argument provided"
+
+	elif [ -e ~/symbology/legacy-prd-prgs/sym_$1 ]; then  
+		cd ~/symbology/legacy-prd-prgs/sym_$1
+
+	else
+		sym_home="/home/user/scollier/symbology/"
+		local matching_dirs=$(find $sym_home -maxdepth 1 -type d -name "*$1*")
+		debug "No of matching dirs: $no_of_matching_dirs"
+		debug "Matching dirs: $matching_dirs"
+
+		if [ -z "$matching_dirs" ]; then
+			echo "No dirs matching '$1'... Try something else?"
+			return 0
+		fi
+		local no_of_matching_dirs=$(echo ${matching_dirs} | sed 's/ /\n/g' | wc -l)
+		if (( $no_of_matching_dirs == 1 )); then 
+			cd $matching_dirs
+		else
+			echo "Many dirs match the pattern '*$1*', please be more specific as we cannot choose between:"
+			echo ${matching_dirs} | sed "s|${sym_home}||g" | sed 's/ /\n/g' | sed 's/^/    -> /g' | grep "$1"
+		fi
+	fi	
+}
+alias legacy=leg
+alias sym=leg
 
 alias python=python3
+alias py=python
 alias pip=pip3
-
 export PATH="${HOME}/.local/bin:${PATH}"
 
-alias dbl_event_logger='perl /home/fonix/prd_progs/tools/dbl/dbl_event_logger.pl'
+function fuzzy_cd {
+	cd *$@*
+}
+alias fuzzycd=fuzzy_cd
+alias fuzzcd=fuzzy_cd
+alias fcd=fuzzy_cd
+
+function fuzzy_vim {
+	vim *$@*
+}
+alias fuzzyvim=fuzzy_vim
+alias fuzzvim=fuzzy_vim
+alias fvim=fuzzy_vim
+alias fvi=fuzzy_vim
+
+# --------------------------------
+#   ---  [ General CLI  ]  ---  
+# --------------------------------
+alias dbops='sudo -u sym_mgr /home/fonix/prd_progs/tools/db_ops/db_ops.sh' 
+alias sym_mgr=dbops
+alias sym_dev='sudo -u sym_dev /home/fonix/prd_progs/tools/db_ops/db_ops.sh'
 
 alias fdb=fdb_utils_main
-alias perldoc='/home/fds/build/FDSperl5.12-FONIXmodules-5.12-20170905/bin/perldoc'
-alias perldocs=perldoc
 alias review='perl /home/data/index/script/common/submit_review_board.pl'
-alias mu_it='/home/fonix/prd_progs/tools/mu_utils/mu_it.pl'
+alias fdsdate='date "+%Y%m%d"'
 
-
+# --------------------------------
+#   ---  [ Wombat Stuff ]  ---  
+# --------------------------------
 alias edit_wombat='perl /home/fonix/prd_progs/tools/wombat/utils/workflow_edit/workflow_edit.pl'
 alias download_workflow='edit_wombat --command=download --fetch_type=workflow --user_env=development --driver=./driver'
 alias wombat2xml='python ~/scripts/wombatxmltocsv.py'
-prd_progs=/home/fonix/prd_progs/
+prd_progs=/home/fonix/prd_progs
+sym_tools=/home/fonix/prd_progs/sym/tools
 
-
-# Scripts I made
+# --------------------------------
+#   ---  [ Prebuild Stuff ]  ---  
+# --------------------------------
 alias make_prebuild='~/scripts/make_prebuild/old_bash/make_prebuild.sh'  # Incomplete
 alias mpre=make_prebuild
+alias mu_it='/home/fonix/prd_progs/tools/mu_utils/mu_it.pl'
+alias src='source X86_64/environment.sh'
 
-alias show_diffs='/home/user/scollier/scripts/show_diffs/show_diffs.sh'
-alias find_diffs=show_diffs
-alias mssql_table_name='perl /home/user/scollier/sym_sql_migration_tools/mssql_table_name.pl'
-alias table_name=mssql_table_name
+alias rkr='echo -e "\e[7m\e[34m$ rakefds -release\e[0m"; rakefds -release'
+alias rkd='echo -e "\e[7m\e[34m$ rakefds -debug\e[0m"; rakefds -debug'
+alias rkb='echo -e "\e[7m\e[34m$ rakefds -build\e[0m"; rakefds -build'
 
+alias gd="source /home/fonix/prd_progs/tools/define_rakefds_logicals.sh release"
+alias gdd="source /home/fonix/prd_progs/tools/define_rakefds_logicals.sh debug"
+
+# --------------------------------
+#   ---  [ Quetex Stuff ]  ---  
+# --------------------------------
+alias qtx='sh ~scollier/scripts/quetex_stats/qtx.sh'
+alias devqtx='sh ~scollier/scripts/dev_quetex_stats/qtx.sh'
+alias dev_qtx=devqtx
 
 alias qq='sh /home/user/dnamufetha/symbology/scripts/page_res/quetex_stats.sh'
+alias danqqs=qq
+alias dan_qqs=qq
+
 alias qqs='sh /home/user/scollier/scripts/quetex_stats/quetex_stats.sh'
+alias devqqs='sh /home/user/scollier/scripts/dev_quetex_stats/quetex_stats.sh'
+alias dev_qqs=devqqs
+
+alias dbl_event_logger='pel /home/fonix/prd_progs/tools/dbl/dbl_event_logger.pl'
+
+# --------------------------------
+#   ---  [ Database Stuff ]  ---  
+# --------------------------------
+alias show_diffs='/home/user/scollier/scripts/show_diffs/show_diffs.sh'
+alias find_diffs=show_diffs
+alias mssql_table_name='perl /home/user/scollier/symbology/legacy-prd-prgs/sym_tools/sql_server_migration/mssql_table_name.pl'
+alias table_name=mssql_table_name
+function run_mysql {
+	sql_script=$1
+	if [ -z $sql_script ]; then 
+		echo "Missing Arg 1: $ run_mysql SQL_SCRIPT"
+		return 2
+	fi
+	sms_mysql -l sym -d symdev -o sql_result.txt < $sql_script
+}
+
+
 # -------------------------------
 #  --- [ Personal @ FactSet] ---  
 # -------------------------------

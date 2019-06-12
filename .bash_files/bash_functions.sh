@@ -205,6 +205,9 @@ function todo {
 	fi
 }
 
+# ---------------------------------------------------------------------------------------------------
+#  Misc 
+# ---------------------------------------------------------------------------------------------------
 
 alias find_prints='echo Finding print statements!; for file in $(find . -name *.py); do  result=$(cat $file | grep print); if [[ ! -z $result ]]; then echo;echo; echo "==============================================================";echo "================[ ${file} ]============"; cat $file | grep print -n;fi; done'
 alias find_print=find_prints
